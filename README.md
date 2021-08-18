@@ -73,10 +73,15 @@ PytorchOCR开源的文本识别算法列表：
 ![检测](doc/imgs/exampl2.png)
 
 ## 贡献代码
-我们非常欢迎你为PytorchOCR贡献代码，也十分感谢你的反馈。
+我们非常欢迎你为PytorchOCR贡献代码，也十分感谢你的反馈
+
+### 特别注意
+该项目follow以下[project](https://github.com/WenmuZhou/PytorchOCR)
+根据自身需求进行一些修复
 
 ## 相关仓库
 * https://github.com/WenmuZhou/OCR_DataSet
+* https://github.com/WenmuZhou/PytorchOCR
 
 pip install torch==1.7.1+cpu torchvision==0.8.2+cpu torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 pip install Shapely-1.7.1-cp37-cp37m-win_amd64.whl
