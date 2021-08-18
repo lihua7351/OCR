@@ -75,7 +75,7 @@ config.dataset = {
     'train': {
         'dataset': {
             'type': 'JsonDataset',
-            'file': r'/data2/liguanhua/OCR/dataset/total/training.json',
+            'file': r'/data/OCR/dataset/total/training.json',
             'mean': [0.485, 0.456, 0.406],
             'std': [0.229, 0.224, 0.225],
             # db 预处理，不需要修改
@@ -102,7 +102,7 @@ config.dataset = {
     'eval': {
         'dataset': {
             'type': 'JsonDataset',
-            'file': r'/data2/liguanhua/OCR/dataset/test.json',
+            'file': r'/data/OCR/dataset/test.json',
             'mean': [0.485, 0.456, 0.406],
             'std': [0.229, 0.224, 0.225],
             'pre_processes': [{'type': 'ResizeShortSize', 'args': {'short_size': 224, 'resize_text_polys': False}}],
