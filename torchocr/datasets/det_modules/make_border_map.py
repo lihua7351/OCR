@@ -28,18 +28,9 @@ class MakeBorderMap():
         mask = np.zeros(im.shape[:2], dtype=np.float32)
 
         for i in range(len(text_polys)):
-            # if ignore_tags[i]:
-            #     continue
-            # self.draw_border_map(text_polys[i], canvas, mask=mask)
-            try:
-                if ignore_tags[i]:
-                    continue
-                self.draw_border_map(text_polys[i], canvas, mask=mask)
-            except:
-                print(len(text_polys),i,text_polys[i],ignore_tags[i])
-
-
-
+            if ignore_tags[i]:
+                continue
+            self.draw_border_map(text_polys[i], canvas, mask=mask)
         canvas = canvas * (self.thresh_max - self.thresh_min) + self.thresh_min
 
         data['threshold_map'] = canvas

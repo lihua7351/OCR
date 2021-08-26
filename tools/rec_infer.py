@@ -83,4 +83,4 @@ if __name__ == '__main__':
     img = cv2.imread(args.img_path)
     model = RecInfer(args.model_path)
     out = model.predict(img)
-    print(out)
+    # print(out)

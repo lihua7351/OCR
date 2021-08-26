@@ -155,7 +155,7 @@ class MobileNetV3(nn.Module):
             logger = logging.getLogger('torchocr')
             if os.path.exists(ckpt_path):
                 logger.info('load imagenet weights')
-                self.load_state_dict(torch.load(ckpt_path),False)
+                self.load_state_dict(torch.load(ckpt_path))
             else:
                 logger.info(f'{ckpt_path} not exists')
 

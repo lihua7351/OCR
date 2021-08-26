@@ -9,7 +9,6 @@ import numpy as np
 from tqdm import tqdm
 from torch.utils.data import Dataset
 from torchvision import transforms
-import skimage.io as io
 from torchocr.datasets.det_modules import *
 
 
@@ -94,19 +93,11 @@ class JsonDataset(Dataset):
         return data
 
     def __getitem__(self, index):
-        # print('__getitem__ --- '+self.data_list[index]['img_path'])
         # try:
         data = copy.deepcopy(self.data_list[index])
-        im = io.imread(data['img_path'])
-        if im.ndim==2:
-            im = cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
-            print(data['img_path'])
-        if im.ndim==3:
-            if im.shape[2]==4:
-                im = im[:,:,0:3]
-        # im = cv2.imread(data['img_path'], 1 if self.img_mode != 'GRAY' else 0)
-        # if self.img_mode == 'RGB':
-        #     im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+        im = cv2.imread(data['img_path'], 1 if self.img_mode != 'GRAY' else 0)
+        if self.img_mode == 'RGB':
+            im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
         data['img'] = im
         data['shape'] = [im.shape[0], im.shape[1]]
         data = self.apply_pre_processes(data)

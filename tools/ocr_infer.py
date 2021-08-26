@@ -1,13 +1,13 @@
 from det_infer import DetInfer
 from rec_infer import RecInfer
 import argparse
+import time
 from line_profiler import LineProfiler
 from memory_profiler import profile
 from torchocr.utils.vis import draw_ocr_box_txt
 import numpy as np
 import os
 import cv2
-import time
 
 def get_files(img_dir):
     imgs = list_files(img_dir)
@@ -19,7 +19,7 @@ def list_files(in_path):
         for file in filenames:
             filename, ext = os.path.splitext(file)
             ext = str.lower(ext)
-            if ext == '.jpg' or  ext == '.gif' or ext == '.png' or ext == '.pgm':
+            if ext == '.gif' or ext == '.png' or ext == '.pgm':
                 img_files.append(os.path.join(dirpath, file))
     return img_files
 
@@ -73,14 +73,19 @@ class OCRInfer(object):
             self.predict = self.predict_mem_profile
 
     def do_predict(self, img):
+        # started = time.time()
         box_list, score_list = self.det_model.predict(img)
-        # print(box_list)
+        # finished = time.time()
+        # print('det_inference time: {0}'.format(finished - started))
         if len(box_list) == 0:
             return [], [], img
         draw_box_list = [tuple(map(tuple, box)) for box in box_list]
         imgs =[get_rotate_crop_image(img, box) for box in box_list]
+        # started = time.time()
         texts = self.rec_model.predict(imgs)
-        print(texts)
+        # finished = time.time()
+        # print('rec inference time: {0}'.format(finished - started))
+        # print(texts)
         texts = [txt[0][0] for txt in texts]
         # print(texts)
         debug_img = draw_ocr_box_txt(img, draw_box_list, texts)
@@ -132,14 +137,16 @@ if __name__ == '__main__':
         img = cv2.imread(image_path)
         res_path = image_path[:-4] +"{}.jpg".format(k)
         model = OCRInfer(**args)
+        # started = time.time()
         txts, boxes, debug_img = model.predict(img)
         finished = time.time()
-        print('inference time: {0}'.format(finished - started))
+        print('ocr_inference time: {0}'.format(finished - started))
         h,w,_, = debug_img.shape
-        raido = 1
-        if w > 1200:
-            raido = 600.0/w
+        raido = 1.0
+        # if w > 1200:
+        #     raido = 600.0/w
         debug_img = cv2.resize(debug_img, (int(w*raido), int(h*raido)))
+        # debug_img = cv2.resize(debug_img, w, h)
 
         if not(args['mem_profile'] or args['time_profile']):
             cv2.imwrite(res_path, debug_img)

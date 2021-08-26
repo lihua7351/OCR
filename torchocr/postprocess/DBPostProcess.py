@@ -41,13 +41,22 @@ class DBPostProcess:
             if min(m_box_width * w, m_box_height * h) < self.shortest_length:
                 continue
             rotated_points = get_coordinates_of_rotated_box(m_rotated_box, height, width)
-            tmp_points.append(rotated_points)
+            #print("points:",rotated_points)
+            # tmp_points.append(rotated_points)
 
             m_available_mask = np.zeros_like(available_region, dtype=np.uint8)
             cv2.drawContours(m_available_mask, [m_contour, ], 0, 255, thickness=-1)
             m_region_mask = cv2.bitwise_and(available_region, available_region, mask=m_available_mask)
             m_mask_count = np.count_nonzero(m_available_mask)
-            tmp_socre.append(float(np.sum(m_region_mask) / m_mask_count))
+            # 这里直接筛选候选区域阈值为0.89
+            if (float(np.sum(m_region_mask) / m_mask_count))>0.89:
+                # print('self.thresh:',self.thresh)
+                # print('tmp_socre: ',float(np.sum(m_region_mask) / m_mask_count))
+                tmp_socre.append(float(np.sum(m_region_mask) / m_mask_count))
+                tmp_points.append(rotated_points)
+                # print('tmp_socre:',tmp_socre)
+                # print('tmp_points:',tmp_points)
+            # tmp_socre.append(float(np.sum(m_region_mask) / m_mask_count))
 
         to_return_boxes.append(tmp_points)
         to_return_scores.append(tmp_socre)
@@ -84,12 +93,15 @@ def get_coordinates_of_rotated_box(_rotated_box, _height, _width):
     center_y = _rotated_box['center_y']
     half_box_width = _rotated_box['box_width'] / 2
     half_box_height = _rotated_box['box_height'] / 2
+    # 这里取得的框，让他取大点，更宽更高(x1-5,y1-5),(x2+5,y2-5),(x3+5,y3+10),(x4-5,y4+10)
     raw_points = np.array([
         [center_x - half_box_width, center_y - half_box_height],
         [center_x + half_box_width, center_y - half_box_height],
         [center_x + half_box_width, center_y + half_box_height],
         [center_x - half_box_width, center_y + half_box_height]
-    ]) * (_width, _height)
+    ]) * (_width, _height) + np.array([[-5.0,-5.0],[5.0,-5.0],[5.0,10.0],[-5.0,10.0]])
+    # print("raw_points",raw_points)
+    
     rotated_points = rotate_points(raw_points, _rotated_box['degree'], (center_x * _width, center_y * _height))
     rotated_points[:, 0] = np.clip(rotated_points[:, 0], a_min=0, a_max=_width)
     rotated_points[:, 1] = np.clip(rotated_points[:, 1], a_min=0, a_max=_height)

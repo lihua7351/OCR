@@ -4,6 +4,7 @@
 import os
 import sys
 import pathlib
+import time
 
 # 将 torchocr路径加到python陆经里
 __dir__ = pathlib.Path(os.path.abspath(__file__))
@@ -14,7 +15,7 @@ import torch
 from torch import nn
 from torchvision import transforms
 from torchocr.networks import build_model
-from torchocr.datasets.det_modules import ResizeShortSize,ResizeFixedSize
+from torchocr.datasets.det_modules import ResizeFixedSize
 from torchocr.postprocess import build_post_process
 
 
@@ -31,7 +32,7 @@ class DetInfer:
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.model.to(self.device)
         self.model.eval()
-        self.resize = ResizeFixedSize(736, False)
+        self.resize = ResizeFixedSize(224, False)
         self.post_process = build_post_process(cfg['post_process'])
         self.transform = transforms.Compose([
             transforms.ToTensor(),
@@ -51,7 +52,7 @@ class DetInfer:
         box_list, score_list = self.post_process(out, data['shape'])
         # print(box_list, score_list)
         box_list, score_list = box_list[0], score_list[0]
-        # print(box_list, score_list)
+        # print(box_list)
         if len(box_list) > 0:
             idx = [x.sum() > 0 for x in box_list]
             box_list = [box_list[i] for i, v in enumerate(idx) if v]
@@ -78,7 +79,10 @@ if __name__ == '__main__':
     args = init_args()
     img = cv2.imread(args.img_path)
     model = DetInfer(args.model_path)
+    started = time.time()
     box_list, score_list = model.predict(img, is_output_polygon=False)
+    finished = time.time()
+    print('det inference time: {0}'.format(finished - started))
     # print(box_list)
     raw_path = args.img_path
     # res_path = raw_path[:-3] + "jpg"

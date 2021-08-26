@@ -57,7 +57,26 @@ class CTCLabelConverter(object):
                 conf = []
                 for i, index in enumerate(word):
                     if word[i] != 0 and (not (i > 0 and word[i - 1] == word[i])):
-                        result.append(self.character[int(index)])
-                        conf.append(prob[i])
+                        str_result = self.character[int(index)]          # 字符的结果,index为对应alphabet里面的行数位置上的字符
+                        if prob[i]>0.55:                                 # 字符对应的置信度阈值
+                            result.append(str_result)
+                            conf.append(prob[i])
+                            print("prob:",prob[i])
+                            print("raw_result:",str_result)
+
+                        elif (str_result in ["0","_","O"]):              # 这里对字符进行捞回，可以在list添加捞回元素
+                            if str_result=="O":                          # 这里对捞回的字符进行替换
+                                print("raw_str:",str_result)
+                                str_result="0"
+                                print("找回的单字符元素替换：",str_result)
+                            result.append(str_result)
+                            conf.append(prob[i])
+                            print("refind_result:",str_result)
+
+
+
+                        # result.append(self.character[int(index)])
+                        # conf.append(prob[i])
+                        # print("prob:",prob[i])
                 result_list.append((''.join(result), conf))
         return result_list
